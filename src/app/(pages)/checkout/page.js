@@ -414,7 +414,7 @@ export default function CheckoutPage() {
                     <span className="font-medium text-secondary">{item.name}</span>
                     <span className="text-gray-500 text-sm">Qty: {item.quantity}</span>
                   </div>
-                  <span className="font-medium text-secondary">${(item.price * item.quantity).toFixed(2)}</span>
+                  <span className="font-medium text-secondary">Rs.{(item.price * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
@@ -422,7 +422,7 @@ export default function CheckoutPage() {
             <div className="space-y-2 mb-4">
               <div className="flex justify-between text-gray-600">
                 <span>Subtotal</span>
-                <span>${total.toFixed(2)}</span>
+                <span>Rs.{total.toFixed(2)}</span>
               </div>
               
               <div className="flex justify-between text-gray-600">
@@ -439,7 +439,7 @@ export default function CheckoutPage() {
             <div className="border-t border-gray-200 pt-4 mb-6">
               <div className="flex justify-between font-bold text-lg text-secondary">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>Rs.{total.toFixed(2)}</span>
               </div>
             </div>
             

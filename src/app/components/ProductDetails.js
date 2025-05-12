@@ -2,18 +2,28 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { StarIcon, ShoppingCart, Truck, Shield, RotateCcw, Check } from 'lucide-react';
-
+import { useCart } from '../context/CartContext';
 export default function ProductDetail({ product }) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedVariation, setSelectedVariation] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const reviewsScrollerRef = useRef(null);
-  const [isPaused, setIsPaused] = useState(false);
+  const reviewsScrollerRef = useRef(null); // Uncommented
+  const [isPaused, setIsPaused] = useState(false); // Uncommented
   const [showNotification, setShowNotification] = useState(false);
+
+  // Helper to clean URL strings
+  const cleanUrl = (url) => {
+    if (typeof url === 'string') {
+      return url.trim().replace(/`/g, '');
+    }
+    return url;
+  };
+  const { addToCart: contextAddToCart } = useCart();
 
   // Set the first variation as default when product loads
   useEffect(() => {
     if (product?.variations?.length > 0) {
+      // Assuming API variation structure matches component's expectation or needs mapping here
       setSelectedVariation(product.variations[0]);
     }
   }, [product]);
@@ -21,25 +31,75 @@ export default function ProductDetail({ product }) {
   // Custom class to hide scrollbar across browsers
   const scrollbarHideClass = "overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden";
 
+  // Static reviews data
+  const staticReviews = [
+    {
+      id: 1,
+      author: 'Rider_X',
+      rating: 5,
+      date: '2024-05-10',
+      comment: 'This helmet is fantastic! Lightweight, comfortable, and offers great protection. The visor is crystal clear. Highly recommend for any serious rider.',
+      image: 'https://images.pexels.com/photos/1323201/pexels-photo-1323201.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&dpr=1', // Example image
+    },
+    {
+      id: 2,
+      author: 'MotoQueen',
+      rating: 4,
+      date: '2024-05-08',
+      comment: 'Good quality jacket for the price. Kept me warm and dry during a light rain. Wish it had more pockets, but overall a solid buy.',
+      image: 'https://images.pexels.com/photos/11026292/pexels-photo-11026292.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&dpr=1',
+    },
+    {
+      id: 3,
+      author: 'SpeedyGonzales',
+      rating: 5,
+      date: '2024-05-05',
+      comment: 'These gloves are a game-changer. Excellent grip and feel. They fit perfectly and look stylish too. Worth every penny!',
+      image: 'https://images.pexels.com/photos/26558690/pexels-photo-26558690/free-photo-of-motorcycle-glove-on-man-hand.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&dpr=1',
+    },
+    {
+      id: 4,
+      author: 'RoadWarrior77',
+      rating: 3,
+      date: '2024-05-02',
+      comment: 'The chain lube works as expected, but the application nozzle could be better. It gets a bit messy. Decent product otherwise.',
+      image: 'https://images.pexels.com/photos/8550669/pexels-photo-8550669.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&dpr=1',
+    },
+    {
+      id: 5,
+      author: 'TwoWheelDreamer',
+      rating: 4,
+      date: '2024-04-28',
+      comment: 'Great tires for my sportbike. They provide excellent traction in corners and feel very stable at high speeds. Let\'s see how long they last.',
+      image: 'https://images.pexels.com/photos/2607554/pexels-photo-2607554.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&dpr=1',
+    },
+  ];
+
   // Auto-scrolling reviews effect
   useEffect(() => {
-    if (!reviewsScrollerRef.current || !product?.reviews?.length || isPaused) return;
+    if (!reviewsScrollerRef.current || staticReviews.length === 0 || isPaused) return;
 
     const scrollerElement = reviewsScrollerRef.current;
     let scrollAmount = 1;
     let scrollInterval;
-    const singleSetWidth = scrollerElement.scrollWidth / 2;
+    // Duplicate reviews for seamless scrolling effect
+    const duplicatedReviews = [...staticReviews, ...staticReviews];
+    const singleSetWidth = scrollerElement.scrollWidth / (duplicatedReviews.length / staticReviews.length);
+
 
     const startScrolling = () => {
       scrollInterval = setInterval(() => {
         scrollerElement.scrollLeft += scrollAmount;
 
-        // If we've scrolled past the first set, reset to the equivalent position
-        if (scrollerElement.scrollLeft >= singleSetWidth) {
-          // Temporarily disable smooth scroll for the jump
-          scrollerElement.style.scrollBehavior = 'auto';
+        if (scrollAmount > 0 && scrollerElement.scrollLeft >= singleSetWidth) {
+          // If scrolling forward and reached the end of the first set, jump back to the beginning
+          scrollerElement.style.scrollBehavior = 'auto'; // Disable smooth scroll for jump
           scrollerElement.scrollLeft -= singleSetWidth;
-          // Re-enable smooth scroll
+          scrollerElement.style.scrollBehavior = 'smooth'; // Re-enable smooth scroll
+        } else if (scrollAmount < 0 && scrollerElement.scrollLeft <= 0) {
+          // If scrolling backward and reached the beginning, jump to the end of the first set
+          scrollerElement.style.scrollBehavior = 'auto';
+          scrollerElement.scrollLeft += singleSetWidth;
           scrollerElement.style.scrollBehavior = 'smooth';
         }
       }, 30);
@@ -48,9 +108,10 @@ export default function ProductDetail({ product }) {
     startScrolling();
 
     return () => clearInterval(scrollInterval);
-  }, [product, isPaused]);
+  }, [isPaused, staticReviews]); // Added staticReviews to dependency array
 
-  if (!product) {
+
+  if (!product || !product.id) { // Check for product.id as a basic validation
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
@@ -62,13 +123,14 @@ export default function ProductDetail({ product }) {
   }
 
   const handleAddToCart = () => {
-    console.log("Added to cart:", {
-      product: product.name,
-      variation: selectedVariation?.name,
-      quantity,
-      price: selectedVariation?.price || product.price,
-    });
-    // Show notification
+    const productForContext = {
+      id: product.id,
+      name: product.name,
+      price: parseFloat(product.price), 
+      quantity: 1,
+      image: product.images && product.images.length > 0 ? product.images[0].src : null
+    };
+    contextAddToCart(productForContext);
     setShowNotification(true);
     setTimeout(() => setShowNotification(false), 3000);
   };
@@ -79,8 +141,17 @@ export default function ProductDetail({ product }) {
     console.log("Proceeding to checkout");
   };
 
-  const displayPrice = selectedVariation?.price || product.price;
-  const displaySalePrice = product.onSale ? (selectedVariation?.salePrice || product.salePrice) : null;
+  // Determine prices based on API data structure
+  const regularPrice = parseFloat(product.regular_price);
+  const currentPrice = parseFloat(product.price); // API 'price' is the current (possibly sale) price
+  const onSale = product.on_sale;
+
+  const displayPrice = selectedVariation ? parseFloat(selectedVariation.regular_price || selectedVariation.price) : regularPrice;
+  const displaySalePrice = selectedVariation 
+    ? (selectedVariation.on_sale ? parseFloat(selectedVariation.sale_price) : null)
+    : (onSale ? currentPrice : null);
+  const finalPriceToShow = displaySalePrice !== null ? displaySalePrice : displayPrice;
+
 
   return (
     <div className="bg-white">
@@ -100,7 +171,7 @@ export default function ProductDetail({ product }) {
                     onClick={() => setSelectedImage(index)}
                   >
                     <img
-                      src={image.src || '/api/placeholder/100/100'}
+                      src={cleanUrl(image.src) || '/api/placeholder/100/100'}
                       alt={`Thumbnail ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
@@ -110,10 +181,10 @@ export default function ProductDetail({ product }) {
             )}
             
             {/* Main image */}
-            <div className="relative flex-grow h-64 sm:h-96 w-full bg-gray-50 rounded-xl overflow-hidden">
+            <div className="relative flex-grow h-64 sm:h-[600px] w-full bg-gray-50 rounded-xl overflow-hidden">
               {product.images && product.images.length > 0 ? (
                 <img 
-                  src={product.images[selectedImage]?.src || '/api/placeholder/500/500'} 
+                  src={cleanUrl(product.images[selectedImage]?.src) || '/api/placeholder/500/500'} 
                   alt={product.images[selectedImage]?.alt || product.name}
                   className="w-full h-full object-contain transition-opacity duration-300"
                 />
@@ -122,46 +193,48 @@ export default function ProductDetail({ product }) {
                   <span className="text-gray-400">No image available</span>
                 </div>
               )}
-              {product.onSale && (
+              {product.on_sale && ( // Use product.on_sale from API
                 <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                   SALE
                 </div>
               )}
+              {/* product.badge is not in the provided data
               {product.badge && (
                 <div className="absolute top-4 right-4 bg-primary text-secondary px-3 py-1 rounded-full text-sm font-bold">
                   {product.badge}
                 </div>
               )}
+              */}
             </div>
           </div>
           
           {/* Product info */}
           <div className="lg:w-1/2">
             {/* Category breadcrumb */}
-            {product.category && (
+            {product.categories && product.categories.length > 0 && (
               <div className="text-sm text-gray-500 mb-2">
-                {`Bike Accessories > ${product.category}`}
+                {`Bike Accessories > ${product.categories[0].name}`}
               </div>
             )}
             
             <h1 className="text-2xl sm:text-3xl font-bold text-secondary">{product.name}</h1>
             
             {/* Rating */}
-            {product.rating !== undefined && (
+            {product.average_rating !== undefined && ( // Use average_rating from API
               <div className="flex items-center mt-2">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
                     <StarIcon 
                       key={i} 
                       size={16} 
-                      className={i < (product.rating || 0) ? "text-primary fill-primary" : "text-gray-300"} 
+                      className={i < (parseFloat(product.average_rating) || 0) ? "text-primary fill-primary" : "text-gray-300"} 
                     />
                   ))}
                 </div>
                 <span className="ml-2 text-sm text-gray-600">
-                  ({product.reviewCount || 0} {product.reviewCount === 1 ? 'review' : 'reviews'})
+                  ({product.rating_count || 0} {product.rating_count === 1 ? 'review' : 'reviews'}) 
                 </span>
-                {product.featured && (
+                {product.featured && ( // Use featured from API
                   <span className="ml-3 bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Top Rated</span>
                 )}
               </div>
@@ -169,27 +242,27 @@ export default function ProductDetail({ product }) {
             
             {/* Price */}
             <div className="mt-4">
-              {displaySalePrice ? (
+              {displaySalePrice !== null && displaySalePrice < displayPrice ? (
                 <div className="flex items-baseline">
                   <span className="text-3xl font-bold text-secondary">
-                    ${displaySalePrice.toFixed(2)}
+                    Rs.{displaySalePrice.toFixed(2)}
                   </span>
                   <span className="ml-2 text-lg text-gray-500 line-through">
-                    ${displayPrice.toFixed(2)}
+                    Rs.{displayPrice.toFixed(2)}
                   </span>
                   <span className="ml-2 bg-red-100 text-red-800 px-2 py-0.5 rounded-md text-xs font-medium">
-                    SAVE ${(displayPrice - displaySalePrice).toFixed(2)}
+                    SAVE Rs.{(displayPrice - displaySalePrice).toFixed(2)}
                   </span>
                 </div>
               ) : (
                 <span className="text-3xl font-bold text-secondary">
-                  ${displayPrice.toFixed(2)}
+                  Rs.{displayPrice.toFixed(2)}
                 </span>
               )}
               
               {/* Stock status */}
               <div className="mt-2">
-                {product.inStock || (selectedVariation && selectedVariation.inStock) ? (
+                {(product.stock_status === 'instock') || (selectedVariation && selectedVariation.stock_status === 'instock') ? (
                   <span className="inline-flex items-center text-green-600 text-sm">
                     <Check size={16} className="mr-1" />
                     In Stock
@@ -203,9 +276,9 @@ export default function ProductDetail({ product }) {
             </div>
             
             {/* Short description */}
-            {product.description && (
+            {product.short_description && ( // Use short_description from API
               <div className="mt-4 text-gray-700">
-                <p>{product.description}</p>
+                <p>{product.short_description}</p>
               </div>
             )}
             
@@ -214,7 +287,7 @@ export default function ProductDetail({ product }) {
               <div className="mt-6">
                 <h3 className="text-sm font-medium text-secondary">Options</h3>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {product.variations.map((variation) => (
+                  {product.variations.map((variation) => ( // Assuming variation structure from API is compatible
                     <button
                       key={variation.id}
                       type="button"
@@ -222,12 +295,12 @@ export default function ProductDetail({ product }) {
                                 ${selectedVariation?.id === variation.id 
                                   ? 'bg-primary text-secondary font-medium shadow-sm' 
                                   : 'bg-gray-100 text-gray-900 hover:bg-gray-200'}
-                                ${!variation.inStock ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      onClick={() => variation.inStock && setSelectedVariation(variation)}
-                      disabled={!variation.inStock}
+                                ${variation.stock_status !== 'instock' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      onClick={() => variation.stock_status === 'instock' && setSelectedVariation(variation)}
+                      disabled={variation.stock_status !== 'instock'}
                     >
-                      {variation.name}
-                      {!variation.inStock && ' (Out of Stock)'}
+                      {variation.attributes?.map(attr => attr.option).join(' - ') || `Variation Rs.{variation.id}`} {/* Example name from attributes */}
+                      {variation.stock_status !== 'instock' && ' (Out of Stock)'}
                     </button>
                   ))}
                 </div>
@@ -267,8 +340,8 @@ export default function ProductDetail({ product }) {
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className="flex-1 bg-white border-2 border-secondary py-3 px-4 text-base font-medium text-secondary hover:bg-gray-50 rounded-md transition flex items-center justify-center"
-                disabled={!product.inStock && (!selectedVariation || !selectedVariation.inStock)}
+                className="flex-1 bg-white border-2 cursor-pointer border-secondary py-3 px-4 text-base font-medium text-secondary hover:bg-gray-50 rounded-md transition flex items-center justify-center"
+                disabled={product.stock_status !== 'instock' && (!selectedVariation || selectedVariation.stock_status !== 'instock')}
               >
                 <ShoppingCart size={18} className="mr-2" />
                 Add to Cart
@@ -276,8 +349,8 @@ export default function ProductDetail({ product }) {
               <button
                 type="button"
                 onClick={handleBuyNow}
-                className="flex-1 bg-primary border-2 border-primary py-3 px-4 text-base font-medium text-secondary hover:bg-primary/90 rounded-md transition"
-                disabled={!product.inStock && (!selectedVariation || !selectedVariation.inStock)}
+                className="flex-1 bg-primary border-2 cursor-pointer border-primary py-3 px-4 text-base font-medium text-secondary hover:bg-primary/90 rounded-md transition"
+                disabled={product.stock_status !== 'instock' && (!selectedVariation || selectedVariation.stock_status !== 'instock')}
               >
                 Buy Now
               </button>
@@ -297,7 +370,7 @@ export default function ProductDetail({ product }) {
                 <Truck size={20} className="text-secondary mr-3 mt-1" />
                 <div>
                   <h4 className="font-medium text-secondary">Free Shipping</h4>
-                  <p className="text-sm text-gray-600">Free standard shipping on orders over $50</p>
+                  <p className="text-sm text-gray-600">Free standard shipping on orders over Rs.50</p>
                 </div>
               </div>
               <div className="flex items-start">
@@ -329,7 +402,7 @@ export default function ProductDetail({ product }) {
                         </div>
                       </div>
                       <p className="ml-2 text-sm text-gray-700">
-                        <span className="font-medium">{key.replace(/([A-Z])/g, ' $1').trim()}:</span> {value}
+                        <span className="font-medium">{key.replace(/([A-Z])/g, ' Rs.1').trim()}:</span> {value}
                       </p>
                     </div>
                   ))}
@@ -340,15 +413,77 @@ export default function ProductDetail({ product }) {
         </div>
         
         {/* Product description */}
-        {product.longDescription && (
+        {product.description && ( // API 'description' is the long HTML description
           <div className="mt-16 border-t border-gray-200 pt-10">
             <h2 className="text-2xl font-bold text-secondary">Product Description</h2>
             <div className="mt-6 prose prose-lg text-gray-700 max-w-none" 
-                 dangerouslySetInnerHTML={{ __html: product.longDescription }} />
+                 dangerouslySetInnerHTML={{ __html: product.description }} />
+          </div>
+        )}
+
+{staticReviews.length > 0 && (
+          <div className="mt-16 border-t border-gray-200 pt-10">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-secondary">Customer Reviews</h2>
+              <button className="text-sm font-medium text-secondary bg-primary px-4 py-2 rounded-md hover:bg-primary/90 transition">
+                Write a Review
+              </button>
+            </div>
+            
+            {/* Overall Rating Summary (optional, if you want to keep it) */}
+            {product.average_rating !== undefined && product.rating_count > 0 && (
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center space-x-4">
+                <div className="text-4xl font-bold text-primary">{parseFloat(product.average_rating).toFixed(1)}</div>
+                <div>
+                  <div className="flex items-center">
+                    {[...Array(5)].map((_, i) => (
+                      <StarIcon 
+                        key={i} 
+                        size={20} 
+                        className={i < (parseFloat(product.average_rating) || 0) ? "text-primary fill-primary" : "text-gray-300"} 
+                      />
+                    ))}
+                  </div>
+                  <p className="text-sm text-gray-600">Based on {product.rating_count} {product.rating_count === 1 ? 'review' : 'reviews'}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Reviews Carousel */}
+            <div 
+              className={`relative ${scrollbarHideClass}`}
+              ref={reviewsScrollerRef}
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
+            >
+              <div className="flex space-x-6 py-4">
+                {/* Duplicate reviews for seamless scrolling */}
+                {[...staticReviews, ...staticReviews].map((review, index) => (
+                  <div key={`${review.id}-${index}`} className="flex-shrink-0 w-80 bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-center mb-3">
+                      {review.image && (
+                        <img src={review.image} alt={review.author} className="w-12 h-12 rounded-full mr-3 object-cover" />
+                      )}
+                      <div>
+                        <h4 className="font-semibold text-secondary">{review.author}</h4>
+                        <div className="flex items-center">
+                          {[...Array(5)].map((_, i) => (
+                            <StarIcon key={i} size={14} className={i < review.rating ? "text-primary fill-primary" : "text-gray-300"} />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-600 leading-relaxed mb-2 line-clamp-4">{review.comment}</p>
+                    <p className="text-xs text-gray-400">{new Date(review.date).toLocaleDateString()}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
         
-        {/* Compatibility section - specific for bike accessories */}
+        {/* Compatibility section - product.compatibility is not in the provided data */}
+        {/*
         {product.compatibility && (
           <div className="mt-16 border-t border-gray-200 pt-10">
             <h2 className="text-2xl font-bold text-secondary">Bike Compatibility</h2>
@@ -371,9 +506,12 @@ export default function ProductDetail({ product }) {
             </div>
           </div>
         )}
+        */}
         
-        {/* Reviews section */}
-        {product.reviews && product.reviews.length > 0 && (
+        {/* Reviews section - product.reviews array is not in the provided data */}
+        {/* API provides average_rating and rating_count, but not individual reviews */}
+        {/*
+        {product.rating_count > 0 && ( // Check if there are any reviews based on count
           <div className="mt-16 border-t border-gray-200 pt-10">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-secondary">Customer Reviews</h2>
@@ -382,51 +520,23 @@ export default function ProductDetail({ product }) {
               </button>
             </div>
             
-            {/* Auto-scrolling reviews */}
-            <div 
-              ref={reviewsScrollerRef}
-              className={`mt-6 flex gap-4 ${scrollbarHideClass} pb-4 pt-2`}
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
-              style={{ scrollBehavior: 'smooth' }}
-            >
-              {/* Duplicate reviews for infinite scroll illusion */}
-              {[...product.reviews, ...product.reviews].map((review, idx) => (
-                <div 
-                  key={review.id ? `${review.id}-${idx}` : idx}
-                  className="flex-shrink-0 bg-gray-50 p-5 rounded-lg w-72 md:w-80 border border-gray-100 shadow-sm"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <StarIcon 
-                          key={i} 
-                          size={14} 
-                          className={i < review.rating ? "text-primary fill-primary" : "text-gray-300"} 
-                        />
-                      ))}
-                    </div>
-                    <span className="text-xs text-gray-500">{review.date}</span>
-                  </div>
-                  <h4 className="mt-2 font-medium text-secondary">{review.author}</h4>
-                  <p className="mt-1 text-sm text-gray-700 line-clamp-4">{review.content}</p>
-                  {review.verifiedPurchase && (
-                    <div className="mt-2 text-xs text-green-600 flex items-center">
-                      <Check size={12} className="mr-1" />
-                      Verified Purchase
-                    </div>
-                  )}
-                </div>
-              ))}
+            <div className="mt-4">
+                <p>This product has an average rating of {parseFloat(product.average_rating).toFixed(1)} stars based on {product.rating_count} reviews.</p>
+                // Individual reviews display would require fetching them separately or having them in the product data.
             </div>
           </div>
         )}
+        */}
         
         {/* You might also like - related products */}
-        {product.relatedProducts && product.relatedProducts.length > 0 && (
+        {/* API provides related_ids, not a full relatedProducts array */}
+        {/* To implement this, you'd fetch products based on product.related_ids */}
+        {/*
+        {product.related_ids && product.related_ids.length > 0 && (
           <div className="mt-16 border-t border-gray-200 pt-10">
             <h2 className="text-2xl font-bold text-secondary">You Might Also Like</h2>
             <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              // Map over fetched related products here
               {product.relatedProducts.map((relatedProduct) => (
                 <div key={relatedProduct.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition">
                   <div className="aspect-square bg-gray-100 relative">
@@ -459,6 +569,7 @@ export default function ProductDetail({ product }) {
             </div>
           </div>
         )}
+        */}
       </div>
     </div>
   );

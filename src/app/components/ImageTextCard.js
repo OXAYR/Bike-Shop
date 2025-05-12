@@ -44,7 +44,7 @@ const ImageTextCard = ({ categories }) => {
             {/* Category stats/info - Optional */}
             <div className="bg-white py-2 px-3 flex justify-between items-center">
               <span className="text-xs text-gray-500">
-                {category.itemCount || '24'} Products
+                {category.count || '24'} Products
               </span>
               
               {/* Visual indicator - can be customized based on category */}

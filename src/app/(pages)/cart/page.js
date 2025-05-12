@@ -17,7 +17,7 @@ export default function CartPage() {
             <h2 className="text-3xl font-bold mb-2 text-secondary">Your Cart is Empty</h2>
             <p className="text-gray-600 mb-6">Looks like you haven't added any bike accessories yet!</p>
             <Link 
-              href="/products" 
+              href="/" 
               className="flex items-center bg-primary text-secondary px-6 py-3 rounded-md font-medium hover:bg-[#dfd247] transition-colors"
             >
               <ArrowLeft size={18} className="mr-2" />
@@ -59,7 +59,7 @@ export default function CartPage() {
                 <div className="sm:w-2/4 mb-4 sm:mb-0">
                   <h3 className="font-medium text-secondary">{item.name}</h3>
                   <p className="text-gray-500 text-sm">Item #: {item.id}</p>
-                  <p className="font-semibold text-secondary mt-1">${item.price.toFixed(2)}</p>
+                  <p className="font-semibold text-secondary mt-1">Rs.{item.price.toFixed(2)}</p>
                 </div>
                 
                 <div className="sm:w-1/4 flex flex-col items-center sm:items-end">
@@ -110,7 +110,7 @@ export default function CartPage() {
             <div className="space-y-3 mb-6">
               <div className="flex justify-between text-gray-600">
                 <span>Subtotal</span>
-                <span>${total.toFixed(2)}</span>
+                <span>Rs.{total.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
                 <span>Shipping</span>
@@ -123,7 +123,7 @@ export default function CartPage() {
               <div className="border-t border-gray-200 pt-3 mt-3">
                 <div className="flex justify-between font-semibold text-lg text-secondary">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>Rs.{total.toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -137,7 +137,7 @@ export default function CartPage() {
               </Link>
               
               <Link 
-                href="/products" 
+                href="/" 
                 className="block w-full bg-white border border-gray-300 text-secondary text-center py-3 rounded-md font-medium hover:bg-gray-50 transition-colors"
               >
                 Continue Shopping
