@@ -14,15 +14,15 @@ const ProductCard = ({ products, isFeatured }) => {
             />
             
             {/* Quick View Overlay */}
-            <div className="absolute inset-0 bg-[#2D2A32]/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <button className="bg-white text-[#2D2A32] px-4 py-2 rounded-md font-medium transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+            <div className="absolute inset-0 bg-secondary/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <button className="bg-white text-secondary px-4 py-2 rounded-md font-medium transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
                 Quick View
               </button>
             </div>
             
             {/* Discount Badge */}
             {item.discount && (
-              <div className="absolute top-3 right-3 bg-[#EAE151] text-[#2D2A32] px-3 py-1 rounded-md font-bold text-sm">
+              <div className="absolute top-3 right-3 bg-primary text-secondary px-3 py-1 rounded-md font-bold text-sm">
                 -{item.discount}% OFF
               </div>
             )}
@@ -36,19 +36,19 @@ const ProductCard = ({ products, isFeatured }) => {
             </div>
             
             {/* Title */}
-            <h3 className="text-[#2D2A32] font-semibold text-lg mb-1 line-clamp-2 h-14">
+            <h3 className="text-secondary font-semibold text-lg mb-1 line-clamp-2 h-14">
               {item.name}
             </h3>
             
             {/* Rating */}
             <div className="flex items-center mb-2">
-              <div className="flex text-[#EAE151]">
+              <div className="flex text-primary">
                 {[...Array(5)].map((_, i) => (
                   <Star 
                     key={i} 
                     size={14} 
                     fill={i < (item.rating || 4) ? "#EAE151" : "none"} 
-                    className={i < (item.rating || 4) ? "text-[#EAE151]" : "text-gray-300"} 
+                    className={i < (item.rating || 4) ? "text-primary" : "text-gray-300"} 
                   />
                 ))}
               </div>
@@ -61,15 +61,15 @@ const ProductCard = ({ products, isFeatured }) => {
                 {item.originalPrice && (
                   <span className="text-gray-400 text-sm line-through">${item.originalPrice.toFixed(2)}</span>
                 )}
-                <span className="text-[#2D2A32] font-bold text-lg">${item.price.toFixed(2)}</span>
+                <span className="text-secondary font-bold text-lg">${item.price.toFixed(2)}</span>
               </div>
               
               {isFeatured ? (
-                <button className="bg-[#2D2A32] text-white p-2 rounded-full hover:bg-[#413e45] transition-colors">
+                <button className="bg-secondary text-white p-2 rounded-full hover:bg-[#413e45] transition-colors">
                   <ShoppingCart size={18} />
                 </button>
               ) : (
-                <button className="bg-[#EAE151] text-[#2D2A32] px-4 py-2 rounded-md font-medium hover:bg-[#d6cd49] transition-colors flex items-center gap-2">
+                <button className="bg-primary text-secondary px-4 py-2 rounded-md font-medium hover:bg-[#d6cd49] transition-colors flex items-center gap-2">
                   <ShoppingCart size={16} />
                   <span>Add to Cart</span>
                 </button>
@@ -79,7 +79,7 @@ const ProductCard = ({ products, isFeatured }) => {
           
           {/* New Badge */}
           {item.isNew && (
-            <div className="absolute top-3 left-3 bg-[#2D2A32] text-white px-3 py-1 rounded-md text-xs font-medium">
+            <div className="absolute top-3 left-3 bg-secondary text-white px-3 py-1 rounded-md text-xs font-medium">
               NEW
             </div>
           )}

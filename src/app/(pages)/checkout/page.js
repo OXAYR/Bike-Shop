@@ -143,17 +143,17 @@ export default function CheckoutPage() {
     return null; // Will redirect in useEffect
   }
 
-  const inputClasses = "w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#EAE151] focus:border-transparent";
-  const labelClasses = "block text-sm font-medium text-[#2D2A32] mb-1";
+  const inputClasses = "w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent";
+  const labelClasses = "block text-sm font-medium text-secondary mb-1";
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center mb-8">
-        <Link href="/cart" className="flex items-center text-[#2D2A32] hover:text-gray-600 mr-4">
+        <Link href="/cart" className="flex items-center text-secondary hover:text-gray-600 mr-4">
           <ArrowLeft size={18} className="mr-1" />
           <span className="text-sm">Back to cart</span>
         </Link>
-        <h1 className="text-3xl font-bold text-[#2D2A32]">Checkout</h1>
+        <h1 className="text-3xl font-bold text-secondary">Checkout</h1>
       </div>
       
       {error && (
@@ -178,8 +178,8 @@ export default function CheckoutPage() {
             {/* Billing Section */}
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center mb-4">
-                <ShoppingBag size={20} className="mr-2 text-[#EAE151]" />
-                <h2 className="text-xl font-semibold text-[#2D2A32]">Your Information</h2>
+                <ShoppingBag size={20} className="mr-2 text-primary" />
+                <h2 className="text-xl font-semibold text-secondary">Your Information</h2>
               </div>
               
               <form onSubmit={handleSubmit}>
@@ -242,8 +242,8 @@ export default function CheckoutPage() {
                 {/* Shipping Address Section */}
                 <div className="mt-8 mb-6">
                   <div className="flex items-center mb-4">
-                    <Truck size={20} className="mr-2 text-[#EAE151]" />
-                    <h2 className="text-xl font-semibold text-[#2D2A32]">Shipping Address</h2>
+                    <Truck size={20} className="mr-2 text-primary" />
+                    <h2 className="text-xl font-semibold text-secondary">Shipping Address</h2>
                   </div>
                   
                   <div className="mb-4">
@@ -334,8 +334,8 @@ export default function CheckoutPage() {
                 {/* Payment Method Section */}
                 <div className="mt-8">
                   <div className="flex items-center mb-4">
-                    <CreditCard size={20} className="mr-2 text-[#EAE151]" />
-                    <h2 className="text-xl font-semibold text-[#2D2A32]">Payment Method</h2>
+                    <CreditCard size={20} className="mr-2 text-primary" />
+                    <h2 className="text-xl font-semibold text-secondary">Payment Method</h2>
                   </div>
                   
                   <div className="space-y-4 mb-6">
@@ -347,9 +347,9 @@ export default function CheckoutPage() {
                           value="bacs"
                           checked={formData.payment_method === 'bacs'}
                           onChange={handlePaymentMethodChange}
-                          className="form-radio h-4 w-4 text-[#EAE151] focus:ring-[#EAE151]"
+                          className="form-radio h-4 w-4 text-primary focus:ring-primary"
                         />
-                        <span className="ml-2 font-medium text-[#2D2A32]">Direct Bank Transfer</span>
+                        <span className="ml-2 font-medium text-secondary">Direct Bank Transfer</span>
                       </label>
                       {formData.payment_method === 'bacs' && (
                         <p className="text-sm text-gray-600 mt-2 ml-6">
@@ -366,9 +366,9 @@ export default function CheckoutPage() {
                           value="cheque"
                           checked={formData.payment_method === 'cheque'}
                           onChange={handlePaymentMethodChange}
-                          className="form-radio h-4 w-4 text-[#EAE151] focus:ring-[#EAE151]"
+                          className="form-radio h-4 w-4 text-primary focus:ring-primary"
                         />
-                        <span className="ml-2 font-medium text-[#2D2A32]">Check Payment</span>
+                        <span className="ml-2 font-medium text-secondary">Check Payment</span>
                       </label>
                       {formData.payment_method === 'cheque' && (
                         <p className="text-sm text-gray-600 mt-2 ml-6">
@@ -385,9 +385,9 @@ export default function CheckoutPage() {
                           value="cod"
                           checked={formData.payment_method === 'cod'}
                           onChange={handlePaymentMethodChange}
-                          className="form-radio h-4 w-4 text-[#EAE151] focus:ring-[#EAE151]"
+                          className="form-radio h-4 w-4 text-primary focus:ring-primary"
                         />
-                        <span className="ml-2 font-medium text-[#2D2A32]">Cash on Delivery</span>
+                        <span className="ml-2 font-medium text-secondary">Cash on Delivery</span>
                       </label>
                       {formData.payment_method === 'cod' && (
                         <p className="text-sm text-gray-600 mt-2 ml-6">
@@ -405,16 +405,16 @@ export default function CheckoutPage() {
         {/* Order Summary Sidebar */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
-            <h2 className="text-xl font-semibold mb-4 text-[#2D2A32]">Order Summary</h2>
+            <h2 className="text-xl font-semibold mb-4 text-secondary">Order Summary</h2>
             
             <div className="border-b border-gray-200 pb-4 mb-4">
               {cart.map((item) => (
                 <div key={item.id} className="flex justify-between py-2">
                   <div className="flex flex-col">
-                    <span className="font-medium text-[#2D2A32]">{item.name}</span>
+                    <span className="font-medium text-secondary">{item.name}</span>
                     <span className="text-gray-500 text-sm">Qty: {item.quantity}</span>
                   </div>
-                  <span className="font-medium text-[#2D2A32]">${(item.price * item.quantity).toFixed(2)}</span>
+                  <span className="font-medium text-secondary">${(item.price * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
@@ -437,7 +437,7 @@ export default function CheckoutPage() {
             </div>
             
             <div className="border-t border-gray-200 pt-4 mb-6">
-              <div className="flex justify-between font-bold text-lg text-[#2D2A32]">
+              <div className="flex justify-between font-bold text-lg text-secondary">
                 <span>Total</span>
                 <span>${total.toFixed(2)}</span>
               </div>
@@ -446,7 +446,7 @@ export default function CheckoutPage() {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="w-full bg-[#EAE151] text-[#2D2A32] font-medium py-3 px-4 rounded-md hover:bg-[#dfd247] transition-colors focus:outline-none focus:ring-2 focus:ring-[#EAE151] focus:ring-opacity-50 flex items-center justify-center"
+              className="w-full bg-primary text-secondary font-medium py-3 px-4 rounded-md hover:bg-[#dfd247] transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 flex items-center justify-center"
             >
               {loading ? (
                 <>
@@ -461,7 +461,7 @@ export default function CheckoutPage() {
             <div className="mt-4 text-center">
               <Link 
                 href="/cart" 
-                className="text-sm text-gray-600 hover:text-[#2D2A32]"
+                className="text-sm text-gray-600 hover:text-secondary"
               >
                 Return to cart
               </Link>

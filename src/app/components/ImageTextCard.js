@@ -20,10 +20,10 @@ const ImageTextCard = ({ categories }) => {
               />
               
               {/* Yellow accent bar */}
-              <div className="absolute inset-x-0 top-0 h-1 bg-[#EAE151] transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+              <div className="absolute inset-x-0 top-0 h-1 bg-primary transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
               
               {/* Content overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#2D2A32]/90 via-[#2D2A32]/50 to-transparent">
+              <div className="absolute inset-0 bg-gradient-to-t from-secondary/90 via-secondary/50 to-transparent">
                 {/* Category name with hover effect */}
                 <div className="absolute bottom-0 inset-x-0 p-4 transform translate-y-0 group-hover:translate-y-[-8px] transition-transform duration-300">
                   <h3 className="text-white font-bold text-xl text-center mb-2">
@@ -32,7 +32,7 @@ const ImageTextCard = ({ categories }) => {
                   
                   {/* Browse button that appears on hover */}
                   <div className="flex justify-center">
-                    <span className="inline-flex items-center text-[#EAE151] text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <span className="inline-flex items-center text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       Browse Collection
                       <ChevronRight size={16} className="ml-1 mt-0.5" />
                     </span>
@@ -49,19 +49,19 @@ const ImageTextCard = ({ categories }) => {
               
               {/* Visual indicator - can be customized based on category */}
               {category.trending && (
-                <span className="text-xs bg-[#EAE151]/20 text-[#2D2A32] px-2 py-0.5 rounded-full font-medium">
+                <span className="text-xs bg-primary/20 text-secondary px-2 py-0.5 rounded-full font-medium">
                   Trending
                 </span>
               )}
               
               {category.isNew && (
-                <span className="text-xs bg-[#2D2A32] text-white px-2 py-0.5 rounded-full font-medium">
+                <span className="text-xs bg-secondary text-white px-2 py-0.5 rounded-full font-medium">
                   New
                 </span>
               )}
               
               {category.onSale && (
-                <span className="text-xs bg-[#EAE151] text-[#2D2A32] px-2 py-0.5 rounded-full font-medium">
+                <span className="text-xs bg-primary text-secondary px-2 py-0.5 rounded-full font-medium">
                   On Sale
                 </span>
               )}

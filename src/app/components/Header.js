@@ -17,7 +17,7 @@ const Header = ({ categories }) => {
           {/* Logo and Mobile Menu Button */}
           <div className="flex items-center space-x-3">
             <button 
-              className="md:hidden text-[#2D2A32] hover:text-[#EAE151] transition-colors"
+              className="md:hidden text-secondary hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle mobile menu"
             >
@@ -25,8 +25,8 @@ const Header = ({ categories }) => {
             </button>
             
             <Link href="/" className="flex items-center space-x-2">
-              <Bike size={28} className="text-[#EAE151]" />
-              <span className="text-[#2D2A32] font-bold text-xl md:text-2xl tracking-tight">BikeGear</span>
+              <Bike size={28} className="text-primary" />
+              <span className="text-secondary font-bold text-xl md:text-2xl tracking-tight">BikeGear</span>
             </Link>
           </div>
           
@@ -36,12 +36,12 @@ const Header = ({ categories }) => {
               <input 
                 type="text" 
                 placeholder="Search for bike accessories..." 
-                className={`w-full px-4 py-2.5 pr-10 bg-gray-50 border ${searchFocused ? 'border-[#EAE151]' : 'border-gray-200'} rounded-lg focus:outline-none transition-all duration-200`}
+                className={`w-full px-4 py-2.5 pr-10 bg-gray-50 border ${searchFocused ? 'border-primary' : 'border-gray-200'} rounded-lg focus:outline-none transition-all duration-200`}
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
               />
-              <div className={`absolute right-3 top-2.5 p-1 rounded-full ${searchFocused ? 'bg-[#EAE151]' : 'bg-gray-100'} transition-colors duration-200`}>
-                <Search className={`${searchFocused ? 'text-[#2D2A32]' : 'text-gray-500'}`} size={18} />
+              <div className={`absolute right-3 top-2.5 p-1 rounded-full ${searchFocused ? 'bg-primary' : 'bg-gray-100'} transition-colors duration-200`}>
+                <Search className={`${searchFocused ? 'text-secondary' : 'text-gray-500'}`} size={18} />
               </div>
             </div>
           </div>
@@ -49,9 +49,9 @@ const Header = ({ categories }) => {
           {/* Cart Icon */}
           <div className="flex items-center space-x-5">
             <Link href="/cart" className="relative p-2 hover:bg-gray-50 rounded-full transition-colors">
-              <ShoppingCart size={24} className="text-[#2D2A32]" />
+              <ShoppingCart size={24} className="text-secondary" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#EAE151] text-[#2D2A32] w-5 h-5 flex items-center justify-center text-xs font-bold rounded-full border-2 border-white">
+                <span className="absolute -top-1 -right-1 bg-primary text-secondary w-5 h-5 flex items-center justify-center text-xs font-bold rounded-full border-2 border-white">
                   {cartCount}
                 </span>
               )}
@@ -69,8 +69,8 @@ const Header = ({ categories }) => {
                 className={`
                   whitespace-nowrap py-2 border-b-2 text-sm font-medium transition-colors duration-200
                   ${category?.name?.includes("Sale") 
-                    ? 'text-[#2D2A32] font-bold border-[#EAE151]' 
-                    : 'text-[#2D2A32] border-transparent hover:border-[#EAE151]'}
+                    ? 'text-secondary font-bold border-primary' 
+                    : 'text-secondary border-transparent hover:border-primary'}
                 `}
               >
                 {category.name}
@@ -89,10 +89,10 @@ const Header = ({ categories }) => {
               <input 
                 type="text" 
                 placeholder="Search for bike accessories..." 
-                className="w-full px-4 py-2.5 pr-10 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#EAE151] focus:border-transparent"
+                className="w-full px-4 py-2.5 pr-10 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
-              <button className="absolute right-3 top-2.5 p-1 rounded-full bg-[#EAE151]">
-                <Search className="text-[#2D2A32]" size={18} />
+              <button className="absolute right-3 top-2.5 p-1 rounded-full bg-primary">
+                <Search className="text-secondary" size={18} />
               </button>
             </div>
             
@@ -105,8 +105,8 @@ const Header = ({ categories }) => {
                   className={`
                     block py-3 px-2 rounded-lg hover:bg-gray-50 transition-colors
                     ${category?.name?.includes("Sale") 
-                      ? 'text-[#2D2A32] font-bold' 
-                      : 'text-[#2D2A32]'}
+                      ? 'text-secondary font-bold' 
+                      : 'text-secondary'}
                   `}
                   onClick={() => setMobileMenuOpen(false)}
                 >
