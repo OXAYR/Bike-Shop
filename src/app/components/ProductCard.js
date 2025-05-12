@@ -1,29 +1,58 @@
+
+'use client'
 import { ShoppingCart, Star } from 'lucide-react';
+import { useRouter } from "next/navigation";
+import { useCart } from '../context/CartContext';
 
 const ProductCard = ({ products, isFeatured }) => {
+  
+ 
+  const router = useRouter();
+  const { addToCart: contextAddToCart } = useCart();
+
+  const handleProductClick = (slug) => {
+    router.push(`/products/${slug}`);
+  };
+
+  
+  const handleAddToCart = (productItem) => { 
+    try {
+      const productForContext = {
+        id: productItem.id,
+        name: productItem.name,
+        price: parseFloat(productItem.price), 
+        quantity: 1,
+        image: productItem.images && productItem.images.length > 0 ? productItem.images[0].src : null
+      };
+      contextAddToCart(productForContext); 
+    } catch (error) {
+      console.error('Error adding to cart via context:', error);
+  
+    }
+  };
+
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {products.map((item) => (
-        <div key={item.id} className="bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 group relative">
+        <div onClick={()=>handleProductClick(item?.slug)} key={item.id} className="bg-white cursor-pointer border border-gray-100 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 group relative">
           {/* Image Container */}
           <div className="relative overflow-hidden h-48 sm:h-56 md:h-64">
             <img
-              src={item.image}
+              src={item.images[0]?.src}
               alt={item.name}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
             
             {/* Quick View Overlay */}
             <div className="absolute inset-0 bg-secondary/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <button className="bg-white text-secondary px-4 py-2 rounded-md font-medium transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                Quick View
-              </button>
+             
             </div>
             
             {/* Discount Badge */}
-            {item.discount && (
+            {item.on_sale && (
               <div className="absolute top-3 right-3 bg-primary text-secondary px-3 py-1 rounded-md font-bold text-sm">
-                -{item.discount}% OFF
+                - {(((item?.regular_price-item?.sale_price)/item?.regular_price)*100).toFixed(0)}% OFF
               </div>
             )}
           </div>
@@ -32,11 +61,11 @@ const ProductCard = ({ products, isFeatured }) => {
           <div className="p-4">
             {/* Category */}
             <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">
-              {item.category || 'Bike Accessory'}
+              {item.categories.map((category, index) => (< span key={index} className="mr-1">{category.name}{index !== item?.categories?.length-1 ? ',': ''}</span>))}
             </div>
             
             {/* Title */}
-            <h3 className="text-secondary font-semibold text-lg mb-1 line-clamp-2 h-14">
+            <h3 className="text-secondary font-semibold text-lg  line-clamp-2 h-12">
               {item.name}
             </h3>
             
@@ -58,18 +87,24 @@ const ProductCard = ({ products, isFeatured }) => {
             {/* Price and Button Row */}
             <div className="flex justify-between items-center mt-3">
               <div className="flex flex-col">
-                {item.originalPrice && (
-                  <span className="text-gray-400 text-sm line-through">${item.originalPrice.toFixed(2)}</span>
+                {item.regular_price && (
+                  <span className="text-gray-400 text-sm line-through">Rs.{item.regular_price}</span>
                 )}
-                <span className="text-secondary font-bold text-lg">${item.price.toFixed(2)}</span>
+                <span className="text-secondary font-bold text-lg">Rs.{item.price}/-</span>
               </div>
               
               {isFeatured ? (
-                <button className="bg-secondary text-white p-2 rounded-full hover:bg-[#413e45] transition-colors">
+                <button  onClick={(event) => {
+                  event.stopPropagation();
+                  handleAddToCart(item); 
+                }} className="bg-secondary cursor-pointer text-white p-2 rounded-full hover:bg-[#413e45] transition-colors">
                   <ShoppingCart size={18} />
                 </button>
               ) : (
-                <button className="bg-primary text-secondary px-4 py-2 rounded-md font-medium hover:bg-[#d6cd49] transition-colors flex items-center gap-2">
+                <button  onClick={(event) => {
+                  event.stopPropagation();
+                  handleAddToCart(item); 
+                }} className="bg-primary cursor-pointer text-secondary px-4 py-2 rounded-md font-medium hover:bg-[#d6cd49] transition-colors flex items-center gap-2">
                   <ShoppingCart size={16} />
                   <span>Add to Cart</span>
                 </button>

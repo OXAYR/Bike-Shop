@@ -74,7 +74,7 @@
 //  );
 // }
 
-'use client'
+
 import Header from './components/Header';
 import HeroCarousal from './components/HeroCarousal';
 import Footer from './components/Footer';
@@ -85,6 +85,7 @@ import ProductItemsSection from './components/ProductItemsSection';
 import { categories } from './lib/categories';
 import CategoryScroller from './components/CategoryScroller';
 import { useCategories } from './context/CategoriesContext';
+import { getProducts } from './lib/products';
 
 // Mock data for demonstration
 
@@ -96,7 +97,7 @@ const hotItems = [
   { id: 4, name: 'Tires', price: 79.99, image: 'https://images.pexels.com/photos/31912758/pexels-photo-31912758/free-photo-of-dynamic-motorcycle-with-green-accents-in-auckland.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' }
 ];
 
-const featuredProducts = [
+const featuredProductsLocal = [
   { id: 1, name: 'Premium Carbon Helmet', price: 249.99, image: 'https://images.pexels.com/photos/1323201/pexels-photo-1323201.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', discount: 15 },
   { id: 2, name: 'All-Weather Riding Jacket', price: 189.99, image: 'https://images.pexels.com/photos/11026292/pexels-photo-11026292.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' },
   { id: 3, name: 'Pro Riding Gloves', price: 59.99, image: 'https://images.pexels.com/photos/26558690/pexels-photo-26558690/free-photo-of-motorcycle-glove-on-man-hand.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', discount: 20 },
@@ -111,43 +112,61 @@ const featuredProducts = [
 
 
 
+import { getFeaturedProducts, getProductsOnSale } from './lib/products';
 
+import HomeContent from './components/HomeContent';
 
-
-export default  function HomePage() {
-  // const categories = await getCategories(); // This line
-  const categories = useCategories();
-
-  console.log(categories);
-
-
-  return (
+// export default async function HomePage() {
+//   // Fetch data from your API functions on the server
   
-      <main>
-        {/* Hero Carousel */}
-        <HeroCarousal />
+//   const categories = await getCategories();
+  
+//   const hotItems = saleProducts?.products || [];
 
-        {/* Hot Items Section */}
-        <ProductItemsSection products={hotItems} heading={'Hot Right Now'}/>
+//   // Pass all fetched data to client component
+ 
+// }
+
+
+
+export default async function HomePage( ) {
+
+  
+  const featuredProducts = await getFeaturedProducts(8);
+  // const saleProducts = await getProductsOnSale(1, 4);
+
+  console.log(featuredProducts);
+
+  return <HomeContent
+  featuredProducts={featuredProducts || featuredProductsLocal} 
+  hotItems={hotItems}
+/>;
+  // return (
+  
+  //     <main>
+  //       {/* Hero Carousel */}
+  //       <HeroCarousal />
+
+  //       {/* Hot Items Section */}
+  //       <ProductItemsSection products={hotItems} heading={'Hot Right Now'}/>
         
-        {/* Categories Section */}
+  //       {/* Categories Section */}
  
             
-           {/* <ImageTextCard categories={categories?.categories} /> */}
-           <CategoryScroller categories={categories?.categories} />
+  //          <CategoryScroller categories={categories?.categories} />
        
 
         
-        {/* Featured Products */}
-        <ProductItemsSection products={featuredProducts} heading={'Featured Products'}/>
+  //       {/* Featured Products */}
+  //       <ProductItemsSection products={featuredProducts} heading={'Featured Products'}/>
         
-        {/* Community Gallery */}
+  //       {/* Community Gallery */}
         
-        <CommunityGallery />
+  //       <CommunityGallery />
        
-      </main>
+  //     </main>
 
     
    
-  );
+  // );
 }

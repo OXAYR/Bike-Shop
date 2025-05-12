@@ -3,9 +3,12 @@
 import { useState } from "react";
 import { Search, Menu, X, ShoppingCart, ChevronDown, Bike } from 'lucide-react';
 import Link from "next/link";
+import { useCart } from "../context/CartContext";
 
 const Header = ({ categories }) => {
   const [cartCount, setCartCount] = useState(3);
+  const {cart} = useCart();
+  
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
 
@@ -50,9 +53,9 @@ const Header = ({ categories }) => {
           <div className="flex items-center space-x-5">
             <Link href="/cart" className="relative p-2 hover:bg-gray-50 rounded-full transition-colors">
               <ShoppingCart size={24} className="text-secondary" />
-              {cartCount > 0 && (
+              {cart?.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-primary text-secondary w-5 h-5 flex items-center justify-center text-xs font-bold rounded-full border-2 border-white">
-                  {cartCount}
+                  {cart?.length}
                 </span>
               )}
             </Link>
