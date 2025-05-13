@@ -2,12 +2,15 @@ import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 
 const ImageTextCard = ({ categories }) => {
+  
+
+
   return (
     <>
       {categories && categories.map((category) => (
         <Link 
           key={category.id} 
-          href={`/category/${category.slug}`}
+          href={`category/${category.id}`}
           className="group relative w-64 sm:w-56 md:w-52 lg:w-64 flex-shrink-0"
         >
           <div className="overflow-hidden rounded-lg shadow-md transition-all duration-300 group-hover:shadow-xl">

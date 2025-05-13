@@ -54,16 +54,58 @@ export async function getProductBySlug(slug) {
 }
 
 /**
- * Fetch products by category ID
+ * Fetch products by category ID, with support for filters and sorting
  */
-export async function getProductsByCategory(categoryId, page = 1, perPage = 20) {
+export async function getProductsByCategory(categoryId, options = {}) {
   try {
-    const response = await api.get("products", {
+    const {
+      page = 1,
+      perPage = 20,
+      min_price,
+      max_price,
+      brands,
+      ratings,
+      sort,
+      ...attributeFilters
+    } = options;
+
+    // Build WooCommerce API params
+    const params = {
       category: categoryId,
       per_page: perPage,
-      page: page
+      page: page,
+    };
+
+    if (min_price) params.min_price = min_price;
+    if (max_price) params.max_price = max_price;
+    if (brands) params.brand = brands; // Adjust if your brand is a custom attribute (e.g., pa_brand)
+    if (ratings) params.rating = ratings; // WooCommerce API does not natively support rating filter, but keep for custom API
+    if (sort) {
+      if (sort === 'price-low') {
+        params.orderby = 'price';
+        params.order = 'asc';
+      } else if (sort === 'price-high') {
+        params.orderby = 'price';
+        params.order = 'desc';
+      } else if (sort === 'newest') {
+        params.orderby = 'date';
+        params.order = 'desc';
+      } else if (sort === 'rating') {
+        params.orderby = 'rating';
+        params.order = 'desc';
+      } else if (sort === 'popularity') {
+        params.orderby = 'popularity';
+        params.order = 'desc';
+      }
+    }
+
+    // Add attribute filters (e.g., pa_color, pa_size)
+    Object.entries(attributeFilters).forEach(([key, value]) => {
+      if (value) params[key] = value;
     });
-    
+
+    const response = await api.get("products", params);
+
     return {
       products: response.data,
       totalPages: parseInt(response.headers['x-wp-totalpages'], 10) || 1,
