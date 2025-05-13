@@ -62,9 +62,9 @@ const Header = ({ categories }) => {
     <header className="bg-white sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4">
         {/* Top navbar */}
-        <div className="flex justify-between items-center py-4">
+        <div className="flex justify-between items-center ">
           {/* Logo and Mobile Menu Button */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center ">
             <button 
               className="md:hidden text-secondary hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -73,9 +73,10 @@ const Header = ({ categories }) => {
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
             
-            <Link href="/" className="flex items-center space-x-2">
-              <Bike size={28} className="text-primary" />
-              <span className="text-secondary font-bold text-xl md:text-2xl tracking-tight">BikeGear</span>
+            <Link href="/" className="flex items-center ">
+              {/* <Bike size={28} className="text-primary" />
+              <span className="text-secondary font-bold text-xl md:text-2xl tracking-tight">BikeGear</span> */}
+              <img src="/logo.png" className="w-28"/>
             </Link>
           </div>
           

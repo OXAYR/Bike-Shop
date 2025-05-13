@@ -8,8 +8,9 @@ return (
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
         <div>
           <div className="flex items-center gap-2 mb-4">
-          <Bike size={28} className="text-primary" />
-            <span className="text-white font-bold text-xl "> BikeGear</span>
+          {/* <Bike size={28} className="text-primary" />
+            <span className="text-white font-bold text-xl "> BikeGear</span> */}
+             <img src="/logo.png" className="w-32"/>
           </div>
           <p className="text-gray-300 mb-4">
             Premium gear for passionate riders. Quality, performance, and style for every journey.
