@@ -4,10 +4,12 @@ import { useState } from "react";
 import { Search, Menu, X, ShoppingCart, ChevronDown, Bike } from 'lucide-react';
 import Link from "next/link";
 import { useCart } from "../context/CartContext";
+import { usePathname } from "next/navigation";
 
 const Header = ({ categories }) => {
   const [cartCount, setCartCount] = useState(3);
   const {cart} = useCart();
+  const pathname = usePathname();
   
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
@@ -151,20 +153,24 @@ const Header = ({ categories }) => {
         {/* Categories navbar */}
         <nav className="hidden md:flex items-center py-3 border-t border-gray-100 overflow-x-auto scrollbar-hide">
           <div className="flex space-x-6 w-full justify-between">
-            {categories.map((category) => (
-              <Link 
-                key={category.id} 
-                href={`/category/${category.slug}`}
-                className={`
-                  whitespace-nowrap py-2 border-b-2 text-sm font-medium transition-colors duration-200
-                  ${category?.name?.includes("Sale") 
-                    ? 'text-secondary font-bold border-primary' 
-                    : 'text-secondary border-transparent hover:border-primary'}
-                `}
-              >
-                {category.name}
-              </Link>
-            ))}
+            {categories.map((category) => {
+              // Check if the current path matches the category
+              const isActive = pathname === `/category/${category.id}`;
+              return (
+                <Link 
+                  key={category.id} 
+                  href={`/category/${category.id}`}
+                  className={`
+                    whitespace-nowrap py-2 border-b-2 text-sm font-medium transition-colors duration-200
+                    ${isActive 
+                      ? ' font-bold border-primary' 
+                      : 'text-secondary border-transparent hover:border-primary'}
+                  `}
+                >
+                  {category.name}
+                </Link>
+              );
+            })}
           </div>
         </nav>
       </div>

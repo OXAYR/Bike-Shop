@@ -52,19 +52,15 @@ export default async function CategoryPage({ params, searchParams }) {
     attributesArray[key] = Array.from(attributes[key]);
   });
 
-  // Find min/max prices
   const prices = products.map(p => parseFloat(p.price)).filter(Boolean);
   const minPrice = prices.length ? Math.min(...prices) : 0;
   const maxPrice = prices.length ? Math.max(...prices) : 10000;
 
-  // Helper to build filter URLs (now just returns the base category URL)
-  // Helper to build filter URLs (fix: only use string keys)
   function buildUrl(newFilters) {
     const merged = { ...(searchParams || {}) };
     Object.keys(newFilters).forEach(key => {
       merged[key] = newFilters[key];
     });
-    // Remove undefined, null, or empty values and ensure only string keys
     Object.keys(merged).forEach(key => {
       const value = merged[key];
       if (
