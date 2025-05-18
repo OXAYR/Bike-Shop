@@ -276,10 +276,8 @@ export default function ProductDetail({ product }) {
             </div>
             
             {/* Short description */}
-            {product.short_description && ( // Use short_description from API
-              <div className="mt-4 text-gray-700">
-                <p>{product.short_description}</p>
-              </div>
+            {product.short_description && (
+              <div className="mt-4 text-gray-700" dangerouslySetInnerHTML={{ __html: product.short_description }} />
             )}
             
             {/* Variations */}

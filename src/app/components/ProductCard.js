@@ -65,7 +65,7 @@ const ProductCard = ({ products, isFeatured }) => {
             </div>
             
             {/* Title */}
-            <h3 className="text-secondary font-semibold text-lg  line-clamp-2 h-12">
+            <h3 className="text-secondary font-semibold text-lg  line-clamp-2 h-16">
               {item.name}
             </h3>
             

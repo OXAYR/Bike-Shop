@@ -92,18 +92,26 @@ export default async function CategoryPage({ params, searchParams }) {
   if (ratings) appliedFilters.push(`Rating: ${ratings}+`);
   if (sort) appliedFilters.push(`Sort: ${sort.charAt(0).toUpperCase() + sort.slice(1).replace('-', ' ')}`);
   Object.keys(attributeFilters).forEach(attr => {
-    appliedFilters.push(`${attr.charAt(0).toUpperCase() + attr.slice(1)}: ${attributeFilters[attr]}`);
+    let value = attributeFilters[attr];
+    if (Array.isArray(value)) {
+      value = value.join(', ');
+    } else if (typeof value === 'object' && value !== null) {
+      value = JSON.stringify(value);
+    }
+    appliedFilters.push(`${attr.charAt(0).toUpperCase() + attr.slice(1)}: ${value}`);
   });
 
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Category Header */}
       <div className="mb-8 relative rounded-lg overflow-hidden">
-        <img
-          src={categoryInfo?.image.src || `/api/placeholder/1200/300?text=${categoryInfo?.name || 'Category'}`}
-          alt={categoryInfo?.name}
-          className="w-full h-48 sm:h-56 object-cover"
-        />
+        {categoryInfo?.image?.src ? (
+          <img
+            src={categoryInfo.image.src}
+            alt={categoryInfo?.name}
+            className="w-full h-48 sm:h-56 object-cover"
+          />
+        ) : null}
         <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 via-transparent to-transparent flex flex-col justify-end p-6">
           <h1 className="text-3xl font-bold text-white mb-2">{categoryInfo?.name}</h1>
           <p className="text-white text-opacity-90 max-w-xl">{categoryInfo?.description}</p>
@@ -127,10 +135,10 @@ export default async function CategoryPage({ params, searchParams }) {
               </form>
             </div>
             {/* Brands */}
-            {brandsList.length > 0 && (
+            {brandsList?.length > 0 && (
               <div className="mb-4">
                 <h3 className="text-sm font-medium text-secondary mb-2">Brands</h3>
-                {brandsList.map(brand => (
+                {brandsList?.map(brand => (
                   <Link key={brand} href={buildUrl({ brands: brand })} className={`block text-sm mb-1 ${brands === brand ? 'font-bold text-primary' : ''}`}>
                     <input type="checkbox" checked={brands === brand} readOnly className="mr-2" />
                     {brand}
@@ -154,17 +162,30 @@ export default async function CategoryPage({ params, searchParams }) {
               ))}
             </div>
             {/* Attribute Filters */}
-            {Object.keys(attributesArray).map(attrName => (
+            {/* {Object.keys(attributesArray).sort().map(attrName => (
               <div key={attrName} className="mb-4">
                 <h3 className="text-sm font-medium text-secondary mb-2">{attrName.charAt(0).toUpperCase() + attrName.slice(1)}</h3>
-                {attributesArray[attrName].map(value => (
-                  <Link key={value} href={buildUrl({ [attrName]: value })} className={`block text-sm mb-1 ${searchParams?.[attrName] === value ? 'font-bold text-primary' : ''}`}>
-                    <input type="checkbox" checked={searchParams?.[attrName] === value} readOnly className="mr-2" />
-                    {value}
-                  </Link>
-                ))}
+                {attributesArray[attrName].map(option => {
+                  const optionStr = typeof option === 'object' && option !== null ? JSON.stringify(option) : String(option);
+                  const checked = String(searchParams?.[attrName]) === optionStr;
+                  return (
+                    <Link
+                      key={optionStr}
+                      href={buildUrl({ [attrName]: optionStr })}
+                      className={`block text-sm mb-1 ${checked ? 'font-bold text-primary' : ''}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        readOnly
+                        className="mr-2"
+                      />
+                      {`${attrName.charAt(0).toUpperCase() + attrName.slice(1)}: ${optionStr}`}
+                    </Link>
+                  );
+                })}
               </div>
-            ))}
+            ))} */}
             {/* Reset Filters */}
             <Link href={`/category/${categoryId}`} className="block mt-4 text-primary text-sm underline">Reset All</Link>
           </div>
