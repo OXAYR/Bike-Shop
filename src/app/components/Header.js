@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search, Menu, X, ShoppingCart, ChevronDown, Bike } from 'lucide-react';
 import Link from "next/link";
 import { useCart } from "../context/CartContext";
 import { usePathname } from "next/navigation";
+import { searchProducts } from "@/app/lib/products"; // Adjust the path as needed
 
 const Header = ({ categories }) => {
   const [cartCount, setCartCount] = useState(3);
@@ -27,23 +28,43 @@ const Header = ({ categories }) => {
     { id: 5, name: 'Sport Bike Tires', slug: 'sport-bike-tires', image: 'https://images.pexels.com/photos/2607554/pexels-photo-2607554.jpeg?auto=compress&cs=tinysrgb&w=1200' },
   ];
 
+  const [loading, setLoading] = useState(false);
+  const debounceTimeout = useRef(null);
+
+  // Remove API call from handleSearchChange, just update searchQuery
   const handleSearchChange = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    if (query.length > 1) { // Start searching after 2 characters
-      // Simulate API call
-      const filteredSuggestions = mockProducts.filter(product =>
-        product.name.toLowerCase().includes(query.toLowerCase())
-      );
-      setAllSuggestions(filteredSuggestions); // Store all results
-      setSuggestions(filteredSuggestions.slice(0, 5)); // Show only top 5
-      setShowSuggestions(true);
+    setSearchQuery(e.target.value);
+  };
+
+  useEffect(() => {
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+    if (searchQuery.length > 1) {
+      setLoading(true);
+      debounceTimeout.current = setTimeout(async () => {
+        try {
+          const { products } = await searchProducts(searchQuery, 1, 20);
+          setAllSuggestions(products);
+          setSuggestions(products.slice(0, 5));
+          setShowSuggestions(true);
+        } catch (error) {
+          setSuggestions([]);
+          setAllSuggestions([]);
+          setShowSuggestions(false);
+        }
+        setLoading(false);
+      }, 3000); // 3 seconds debounce
     } else {
       setSuggestions([]);
       setAllSuggestions([]);
       setShowSuggestions(false);
+      setLoading(false);
     }
-  };
+    return () => {
+      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    };
+  }, [searchQuery]);
 
   const handleSearchFocus = () => {
     setSearchFocused(true);
@@ -98,29 +119,36 @@ const Header = ({ categories }) => {
                 <Search className={`${searchFocused ? 'text-secondary' : 'text-gray-500'}`} size={18} />
               </div>
               {/* Suggestions Dropdown */}
-              {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 "> {/* Removed max-h-80 and overflow-y-auto here, will apply to list */}
-                  <div className="max-h-80 overflow-y-auto"> {/* Apply scroll to the list part only */}
-                    {suggestions.map(product => (
-                      <Link 
-                        key={product.id} 
-                        href={`/products/${product.slug}`} // Assuming your product URLs are /products/:slug
-                        className="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors"
-                        onClick={() => {
-                          setSearchQuery(''); // Clear search query
-                          setSuggestions([]);
-                          setAllSuggestions([]);
-                          setShowSuggestions(false);
-                        }}
-                      >
-                        {product.image && (
-                          <img src={product.image} alt={product.name} className="w-10 h-10 object-cover rounded-md mr-3" />
-                        )}
-                        <span className="text-sm text-secondary">{product.name}</span>
-                      </Link>
-                    ))}
+              {(showSuggestions || loading) && (suggestions.length > 0 || loading) && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 ">
+                  <div className="max-h-80 overflow-y-auto">
+                    {loading ? (
+                      <div className="flex items-center justify-center py-6">
+                        <span className="loader mr-2"></span>
+                        <span className="text-sm text-secondary">Loading...</span>
+                      </div>
+                    ) : (
+                      suggestions.map(product => (
+                        <Link 
+                          key={product.id} 
+                          href={`/products/${product.slug}`}
+                          className="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors"
+                          onClick={() => {
+                            setSearchQuery('');
+                            setSuggestions([]);
+                            setAllSuggestions([]);
+                            setShowSuggestions(false);
+                          }}
+                        >
+                          {product.images && (
+                            <img src={product.images[0]?.src} alt={product.name} className="w-10 h-10 object-cover rounded-md mr-3" />
+                          )}
+                          <span className="text-sm text-secondary">{product.name}</span>
+                        </Link>
+                      ))
+                    )}
                   </div>
-                  {allSuggestions.length > 5 && (
+                  {!loading && allSuggestions.length > 5 && (
                     <Link
                       href={`/search?q=${encodeURIComponent(searchQuery)}`}
                       className="block text-center px-4 py-3 text-sm font-medium text-primary hover:bg-gray-50 border-t border-gray-200 rounded-b-lg"
